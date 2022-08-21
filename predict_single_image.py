@@ -65,13 +65,9 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
 
 
     # create transformations to image and labels
-    transforms1 = [
-        NiftiDataset.Resample(resolution, resample)
-    ]
+    transforms1 = []
 
-    transforms2 = [
-        NiftiDataset.Padding((patch_size_x, patch_size_y, patch_size_z))
-    ]
+    transforms2 = []
 
     # read image file
     reader = sitk.ImageFileReader()
