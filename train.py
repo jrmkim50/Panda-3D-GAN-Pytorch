@@ -44,7 +44,6 @@ print('Number of validation patches per epoch:', len(val_list))
 
 # -----  Transformation and Augmentation process for the data  -----
 trainTransforms = [
-            NiftiDataset.Resample(opt.new_resolution, opt.resample),
             NiftiDataset.Augmentation(),
             NiftiDataset.Padding((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2])),
             NiftiDataset.RandomCrop((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]), opt.drop_ratio, min_pixel),
@@ -163,12 +162,12 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         generator_total_loss.backward()
         optim_generator.step()
 
-
         ######### Status and display #########
-        sys.stdout.write(
-            '\r [%d/%d][%d/%d] Discriminator_Loss: %.4f Generator_Loss: %.4f' % (
+        print (
+            "\r [%d/%d][%d/%d] Discriminator_Loss: %.4f Generator_Loss: %.4f" % (
                 epoch_count, (opt.niter + opt.niter_decay + 1), batch_idx, len(train_loader),
-                discriminator_loss, generator_total_loss))
+                discriminator_loss, generator_total_loss), 
+            end="")
 
     update_learning_rate(net_g_scheduler, optim_generator)
     update_learning_rate(net_d_scheduler, optim_discriminator)
