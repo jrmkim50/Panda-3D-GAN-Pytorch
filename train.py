@@ -43,7 +43,11 @@ print('Number of validation patches per epoch:', len(val_list))
 
 
 # -----  Transformation and Augmentation process for the data  -----
-trainTransforms = [NiftiDataset.Augmentation()]
+trainTransforms = [
+            NiftiDataset.Augmentation(),
+            NiftiDataset.Padding((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2])),
+            NiftiDataset.RandomCrop((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]), opt.drop_ratio, min_pixel),
+            ]
 
 train_set = NifitDataSet(train_list, direction=opt.direction, transforms=trainTransforms, train=True)    # define the dataset and loader
 train_loader = DataLoader(train_set, batch_size=opt.batch_size, shuffle=True, num_workers=opt.workers)  # Here are then fed to the network with a defined batch size
