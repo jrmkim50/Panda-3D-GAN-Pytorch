@@ -443,11 +443,15 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         if self.train:
             label = self.read_image(label_path)
+            # TODO: remove
+            label = Normalization(label)
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
         elif self.test:
             label = self.read_image(label_path)
+            # TODO: remove
+            label = Normalization(label)
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
