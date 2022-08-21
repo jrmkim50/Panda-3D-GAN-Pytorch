@@ -397,7 +397,7 @@ class NifitDataSet(torch.utils.data.Dataset):
         is a dict with two item include data path and label path. as follow:
         data_list = [
         {
-        "data":　data_path_1,
+        "data": data_path_1,
         "label": label_path_1,
         },
         {
@@ -434,7 +434,7 @@ class NifitDataSet(torch.utils.data.Dataset):
         # read image and label
         image = self.read_image(data_path)
 
-        image = Normalization(image)  # set intensity 0-255
+        image = Normalization(image)  # set intensity 0-1
 
         # cast image and label
         castImageFilter = sitk.CastImageFilter()
@@ -443,15 +443,11 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         if self.train:
             label = self.read_image(label_path)
-            if Segmentation is False:
-                label = Normalization(label)  # set intensity 0-255
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
         elif self.test:
             label = self.read_image(label_path)
-            if Segmentation is False:
-                label = Normalization(label)  # set intensity 0-255
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
@@ -467,18 +463,12 @@ class NifitDataSet(torch.utils.data.Dataset):
                 sample = transform(sample)
 
         # convert sample to tf tensors
-        image_np = abs(sitk.GetArrayFromImage(sample['image']))
-        label_np = abs(sitk.GetArrayFromImage(sample['label']))
-
-        if Segmentation is True:
-            label_np = abs(np.around(label_np))
+        image_np = sitk.GetArrayFromImage(sample['image'])
+        label_np = sitk.GetArrayFromImage(sample['label'])
 
         # to unify matrix dimension order between SimpleITK([x,y,z]) and numpy([z,y,x])  (actually it´s the contrary)
         image_np = np.transpose(image_np, (2, 1, 0))
         label_np = np.transpose(label_np, (2, 1, 0))
-
-        label_np = (label_np - 127.5) / 127.5
-        image_np = (image_np - 127.5) / 127.5
 
         image_np = image_np[np.newaxis, :, :, :]
         label_np = label_np[np.newaxis, :, :, :]
@@ -491,15 +481,15 @@ class NifitDataSet(torch.utils.data.Dataset):
 
 def Normalization(image):
     """
-    Normalize an image to 0 - 255 (8bits)
+    Normalize an image to 0 - 1
     """
     normalizeFilter = sitk.NormalizeImageFilter()
     resacleFilter = sitk.RescaleIntensityImageFilter()
-    resacleFilter.SetOutputMaximum(255)
+    resacleFilter.SetOutputMaximum(1)
     resacleFilter.SetOutputMinimum(0)
 
     image = normalizeFilter.Execute(image)  # set mean and std deviation
-    image = resacleFilter.Execute(image)  # set intensity 0-255
+    image = resacleFilter.Execute(image)  # set intensity 0-1
 
     return image
 
@@ -841,7 +831,7 @@ class CropBackground(object):
         size_new = self.output_size
 
         threshold = sitk.BinaryThresholdImageFilter()
-        threshold.SetLowerThreshold(1)
+        threshold.SetLowerThreshold(0.01)
         threshold.SetUpperThreshold(255)
         threshold.SetInsideValue(1)
         threshold.SetOutsideValue(0)
@@ -980,58 +970,14 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+        choice = np.random.choice([0, 5, 9, 10, 11])
 
         # no augmentation
         if choice == 0:  # no augmentation
 
             image, label = sample['image'], sample['label']
             return {'image': image, 'label': label}
-
-        # Additive Gaussian noise
-        if choice == 1:  # Additive Gaussian noise
-
-            mean = np.random.uniform(0, 1)
-            std = np.random.uniform(0, 2)
-            self.noiseFilter = sitk.AdditiveGaussianNoiseImageFilter()
-            self.noiseFilter.SetMean(mean)
-            self.noiseFilter.SetStandardDeviation(std)
-
-            image, label = sample['image'], sample['label']
-            image = self.noiseFilter.Execute(image)
-            if Segmentation is False:
-                label = self.noiseFilter.Execute(label)
-
-            return {'image': image, 'label': label}
-
-        # Recursive Gaussian
-        if choice == 2:  # Recursive Gaussian
-
-            sigma = np.random.uniform(0, 1.5)
-            self.noiseFilter = sitk.RecursiveGaussianImageFilter()
-            self.noiseFilter.SetOrder(0)
-            self.noiseFilter.SetSigma(sigma)
-
-            image, label = sample['image'], sample['label']
-            image = self.noiseFilter.Execute(image)
-            if Segmentation is False:
-                label = self.noiseFilter.Execute(label)    # comment for segmentation
-
-            return {'image': image, 'label': label}
-
-        # Random rotation x y z
-        if choice == 3:  # Random rotation
-
-            theta_x = np.random.randint(-40, 40)
-            theta_y = np.random.randint(-40, 40)
-            theta_z = np.random.randint(-180, 180)
-            image, label = sample['image'], sample['label']
-
-            image = rotation3d_image(image,theta_x,theta_y, theta_z)
-            label = rotation3d_label(label,theta_x,theta_y, theta_z)
-
-            return {'image': image, 'label': label}
-
+        
         # BSpline Deformation
         if choice == 4:  # BSpline Deformation
 
@@ -1071,42 +1017,6 @@ class Augmentation(object):
 
             image = flipit(image, axes)
             label = flipit(label, axes)
-
-            return {'image': image, 'label': label}
-
-        # Brightness
-        if choice == 6:  # Brightness
-
-            image, label = sample['image'], sample['label']
-
-            image = brightness(image)
-            if Segmentation is False:
-                label = brightness(label)
-
-            return {'image': image, 'label': label}
-
-        # Contrast
-        if choice == 7:  # Contrast
-
-            image, label = sample['image'], sample['label']
-
-            image = contrast(image)
-            if Segmentation is False:
-                label = contrast(label)             # comment for segmentation
-
-            return {'image': image, 'label': label}
-
-        # Translate
-        if choice == 8:  # translate
-
-            image, label = sample['image'], sample['label']
-
-            t1 = np.random.randint(-40, 40)
-            t2 = np.random.randint(-40, 40)
-            offset = [t1, t2]
-
-            image = translateit(image, offset)
-            label = translateit(label, offset)
 
             return {'image': image, 'label': label}
 
