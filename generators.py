@@ -122,7 +122,6 @@ class ResnetGenerator(nn.Module):
         # model += [nn.ReflectionPad2d(3)]
         model += [nn.ReplicationPad3d(3)]
         model += [nn.Conv3d(ngf, output_nc, kernel_size=7, padding=0)]
-        model += [nn.Tanh()]
 
 
         self.model = nn.Sequential(*model)
@@ -193,7 +192,7 @@ class ResnetBlock(nn.Module):
 class UnetGenerator(nn.Module):
     """Create a Unet-based generator"""
 
-    def __init__(self, input_nc=1, output_nc=1, num_downs=6, ngf=64, norm_layer=nn.BatchNorm3d, use_dropout=True):
+    def __init__(self, input_nc=1, output_nc=1, num_downs=6, ngf=64, norm_layer=nn.BatchNorm3d, use_dropout=False):
         super(UnetGenerator, self).__init__()
 
         # currently support only input_nc == output_nc
@@ -250,7 +249,7 @@ class UnetSkipConnectionBlock(nn.Module):
         if outermost:
             upconv = nn.ConvTranspose3d(inner_nc * 2, outer_nc, kernel_size=4, stride=2, padding=1)
             down = [downconv]
-            up = [uprelu, upconv, nn.Tanh()]
+            up = [uprelu, upconv]
             model = down + [submodule] + up
         elif innermost:
             upconv = nn.ConvTranspose3d(inner_nc, outer_nc, kernel_size=4, stride=2, padding=1, bias=use_bias)
@@ -279,9 +278,9 @@ class UnetSkipConnectionBlock(nn.Module):
 
 def build_netG(opt):
     if opt.netG == 'resnet':
-        generator = ResnetGenerator(opt.img_channel, opt.img_channel, opt.ngf, use_dropout=True, n_blocks=9)
+        generator = ResnetGenerator(opt.img_channel, opt.img_channel, opt.ngf, use_dropout=False, n_blocks=9)
     elif opt.netG == 'Unet':
-        generator = UnetGenerator(ngf=opt.ngf, use_dropout=True, norm_layer=nn.BatchNorm3d)
+        generator = UnetGenerator(ngf=opt.ngf, use_dropout=False, norm_layer=nn.BatchNorm3d)
     else:
         raise NotImplementedError
 

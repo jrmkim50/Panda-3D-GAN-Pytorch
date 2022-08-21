@@ -39,9 +39,20 @@ args = parser.parse_args()
 
 if __name__ == "__main__":
 
-    list_images = lstFiles(args.images)
-    list_labels = lstFiles(args.labels)
-
+#     list_images = lstFiles(args.images)
+#     list_labels = lstFiles(args.labels)
+    list_labels = sorted(["../pet_dataset_7_13/"+file for file in os.listdir("../pet_dataset_7_13") if file[0] != "."])
+    numbers = set([file.split("/")[-1].split("_")[0] for file in list_labels])
+    list_images = sorted(["../dataset_5_29/"+file for file in os.listdir("../dataset_5_29") \
+                   if (file[0] != "." and file.split("_")[0] in numbers)])
+    # test files
+    list_labels += ["../test-dataset-8-8/pet/i103910_img_pet_0.nii.gz", "../test-dataset-8-8/pet/i103910_img_pet_1.nii.gz"]
+    list_images += ["../test-dataset-8-8/ct/i103910_img_ct_0.nii.gz", "../test-dataset-8-8/ct/i103910_img_ct_1.nii.gz"]
+    
+    print(list_labels, list_images)
+        
+    assert len(list_labels) == len(list_images)
+    
     if not os.path.isdir('./Data_folder/train'):
         os.mkdir('./Data_folder/train')
 
@@ -50,8 +61,8 @@ if __name__ == "__main__":
 
     for i in range(len(list_images)-int(args.split)):
 
-        a = list_images[int(args.split)+i]
-        b = list_labels[int(args.split)+i]
+        a = list_images[i]
+        b = list_labels[i]
 
         print(a)
 
@@ -72,8 +83,8 @@ if __name__ == "__main__":
 
     for i in range(int(args.split)):
 
-        a = list_images[i]
-        b = list_labels[i]
+        a = list_images[len(list_images)-int(args.split)+i]
+        b = list_labels[len(list_images)-int(args.split)+i]
 
         print(a)
 
@@ -90,4 +101,3 @@ if __name__ == "__main__":
 
         sitk.WriteImage(image, image_directory)
         sitk.WriteImage(label, label_directory)
-
