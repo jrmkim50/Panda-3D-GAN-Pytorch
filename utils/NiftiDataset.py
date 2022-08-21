@@ -970,43 +970,12 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 5, 9, 10, 11])
+        choice = np.random.choice([0, 5, 10, 11])
 
         # no augmentation
         if choice == 0:  # no augmentation
 
             image, label = sample['image'], sample['label']
-            return {'image': image, 'label': label}
-        
-        # BSpline Deformation
-        if choice == 4:  # BSpline Deformation
-
-            randomness = 10
-
-            assert isinstance(randomness, (int, float))
-            if randomness > 0:
-                self.randomness = randomness
-            else:
-                raise RuntimeError('Randomness should be non zero values')
-
-            image, label = sample['image'], sample['label']
-            spline_order = 3
-            domain_physical_dimensions = [image.GetSize()[0] * image.GetSpacing()[0],
-                                          image.GetSize()[1] * image.GetSpacing()[1],
-                                          image.GetSize()[2] * image.GetSpacing()[2]]
-
-            bspline = sitk.BSplineTransform(3, spline_order)
-            bspline.SetTransformDomainOrigin(image.GetOrigin())
-            bspline.SetTransformDomainDirection(image.GetDirection())
-            bspline.SetTransformDomainPhysicalDimensions(domain_physical_dimensions)
-            bspline.SetTransformDomainMeshSize((10, 10, 10))
-
-            # Random displacement of the control points.
-            originalControlPointDisplacements = np.random.random(len(bspline.GetParameters())) * self.randomness
-            bspline.SetParameters(originalControlPointDisplacements)
-
-            image = sitk.Resample(image, bspline)
-            label = sitk.Resample(label, bspline)
             return {'image': image, 'label': label}
 
         # Random flip
@@ -1017,19 +986,6 @@ class Augmentation(object):
 
             image = flipit(image, axes)
             label = flipit(label, axes)
-
-            return {'image': image, 'label': label}
-
-        # Random rotation z
-        if choice == 9:  # Random rotation
-
-            theta_x = 0
-            theta_y = 0
-            theta_z = np.random.randint(-180, 180)
-            image, label = sample['image'], sample['label']
-
-            image = rotation3d_image(image, theta_x, theta_y, theta_z)
-            label = rotation3d_label(label, theta_x, theta_y, theta_z)
 
             return {'image': image, 'label': label}
 
