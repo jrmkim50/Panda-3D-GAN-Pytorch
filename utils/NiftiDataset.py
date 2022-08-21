@@ -443,15 +443,11 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         if self.train:
             label = self.read_image(label_path)
-            # TODO: remove
-            label = Normalization(label)
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
         elif self.test:
             label = self.read_image(label_path)
-            # TODO: remove
-            label = Normalization(label)
             castImageFilter.SetOutputPixelType(self.bit)
             label = castImageFilter.Execute(label)
 
@@ -476,6 +472,8 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         image_np = image_np[np.newaxis, :, :, :]
         label_np = label_np[np.newaxis, :, :, :]
+        
+        label_np[label_np > 2] = 2
 
         return torch.from_numpy(image_np), torch.from_numpy(label_np)  # this is the final output to feed the network
 
