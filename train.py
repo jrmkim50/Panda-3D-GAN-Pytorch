@@ -174,7 +174,11 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
 
     ##### Logger ######
 
-    val_set = NifitDataSet(val_list, direction=opt.direction, transforms=[], test=True)
+    val_transforms = [
+            NiftiDataset.Padding((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2])),
+            NiftiDataset.RandomCrop((opt.patch_size[0], opt.patch_size[1], opt.patch_size[2]), opt.drop_ratio, min_pixel),
+    ]
+    val_set = NifitDataSet(val_list, direction=opt.direction, transforms=val_transforms, test=True)
     val_loader = DataLoader(val_set, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
 
     plot_generated_batch(val_list=val_list, model=generator, resample=opt.resample, resolution=opt.new_resolution,
