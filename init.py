@@ -12,6 +12,7 @@ class Options():
         # model parameters
         parser.add_argument('--netG', type=str, default='Unet', help='[resnet | Unet]')
         # aug 13, 2022 notes: pixelgan works well
+        # aug 22, 2022: generator loss goes from ~3 to 0.6
         parser.add_argument('--netD', type=str, default='PixelGAN', help='[PatchGAN | PixelGAN]')
         parser.add_argument('--ndf', default=128, type=int, help='number of filters in discriminator')
         parser.add_argument('--ngf', default=64, type=int, help='number of filters in generator')
