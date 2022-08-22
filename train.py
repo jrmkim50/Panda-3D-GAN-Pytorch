@@ -123,24 +123,25 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         ######################
         # (1) Update D network
         ######################
-        optim_discriminator.zero_grad()
+        # optim_discriminator.zero_grad()
 
-        # train with fake
-        fake_ab = torch.cat((real_a, fake_b), 1)
-        pred_fake = discriminator.forward(fake_ab.detach())
-        loss_d_fake = criterionGAN(pred_fake, False)
+        # # train with fake
+        # fake_ab = torch.cat((real_a, fake_b), 1)
+        # pred_fake = discriminator.forward(fake_ab.detach())
+        # loss_d_fake = criterionGAN(pred_fake, False)
 
-        # train with real
-        real_ab = torch.cat((real_a, real_b), 1)
-        pred_real = discriminator.forward(real_ab)
-        loss_d_real = criterionGAN(pred_real, True)
+        # # train with real
+        # real_ab = torch.cat((real_a, real_b), 1)
+        # pred_real = discriminator.forward(real_ab)
+        # loss_d_real = criterionGAN(pred_real, True)
 
-        # Combined D loss
-        discriminator_loss = (loss_d_fake + loss_d_real) * 0.5
+        # # Combined D loss
+        # discriminator_loss = (loss_d_fake + loss_d_real) * 0.5
+        discriminator_loss = 0
 
-        mean_discriminator_loss += discriminator_loss
-        discriminator_loss.backward()
-        optim_discriminator.step()
+        # mean_discriminator_loss += discriminator_loss
+        # discriminator_loss.backward()
+        # optim_discriminator.step()
 
         ######################
         # (2) Update G network
@@ -149,9 +150,9 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         optim_generator.zero_grad()
 
         # First, G(A) should fake the discriminator
-        fake_ab = torch.cat((real_a, fake_b), 1)
-        pred_fake = discriminator.forward(fake_ab)
-        loss_g_gan = criterionGAN(pred_fake, True)
+        # fake_ab = torch.cat((real_a, fake_b), 1)
+        # pred_fake = discriminator.forward(fake_ab)
+        # loss_g_gan = criterionGAN(pred_fake, True)
 
         # Second, G(A) = B
         loss_g_l1 = criterion_pixelwise(fake_b, real_b) * opt.lamb
