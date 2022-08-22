@@ -173,7 +173,7 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
             end="")
 
     update_learning_rate(net_g_scheduler, optim_generator)
-    update_learning_rate(net_d_scheduler, optim_discriminator)
+    # update_learning_rate(net_d_scheduler, optim_discriminator)
 
     ##### Logger ######
 
