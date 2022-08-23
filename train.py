@@ -120,34 +120,34 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         else:
             fake_b = generator(real_a)
 
-        ######################
+        #####################
         # (1) Update D network
-        ######################
-        # optim_discriminator.zero_grad()
+        #####################
+        optim_discriminator.zero_grad()
 
-        # # train with fake
-        # fake_ab = torch.cat((real_a, fake_b), 1)
-        # pred_fake = discriminator.forward(fake_ab.detach())
-        # loss_d_fake = criterionGAN(pred_fake, False)
+        # train with fake
+        fake_ab = torch.cat((real_a, fake_b), 1)
+        pred_fake = discriminator.forward(fake_ab.detach())
+        loss_d_fake = criterionGAN(pred_fake, False)
 
-        # # train with real
-        # real_ab = torch.cat((real_a, real_b), 1)
-        # pred_real = discriminator.forward(real_ab)
-        # loss_d_real = criterionGAN(pred_real, True)
+        # train with real
+        real_ab = torch.cat((real_a, real_b), 1)
+        pred_real = discriminator.forward(real_ab)
+        loss_d_real = criterionGAN(pred_real, True)
 
-        # # Combined D loss
-        # discriminator_loss = (loss_d_fake + loss_d_real) * 0.5
-        discriminator_loss = 0
+        # Combined D loss
+        discriminator_loss = (loss_d_fake + loss_d_real) * 0.5
+        # discriminator_loss = 0
 
-        # mean_discriminator_loss += discriminator_loss
-        # discriminator_loss.backward()
-        # optim_discriminator.step()
+        mean_discriminator_loss += discriminator_loss
+        discriminator_loss.backward()
+        optim_discriminator.step()
 
         ######################
         # (2) Update G network
         ######################
 
-        optim_generator.zero_grad()
+        # optim_generator.zero_grad()
 
         # First, G(A) should fake the discriminator
         # fake_ab = torch.cat((real_a, fake_b), 1)
@@ -155,15 +155,16 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         # loss_g_gan = criterionGAN(pred_fake, True)
 
         # Second, G(A) = B
-        loss_g_l1 = criterion_pixelwise(fake_b, real_b) * opt.lamb
+        # loss_g_l1 = criterion_pixelwise(fake_b, real_b) * opt.lamb
 
         # generator_total_loss = loss_g_gan + loss_g_l1
         # Let's try a pure unet translation
-        generator_total_loss = loss_g_l1
+        # generator_total_loss = loss_g_l1
+        generator_total_loss = 0
 
-        mean_generator_total_loss += generator_total_loss
-        generator_total_loss.backward()
-        optim_generator.step()
+        # mean_generator_total_loss += generator_total_loss
+        # generator_total_loss.backward()
+        # optim_generator.step()
 
         ######### Status and display #########
         print (
@@ -172,8 +173,8 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
                 discriminator_loss, generator_total_loss), 
             end="")
 
-    update_learning_rate(net_g_scheduler, optim_generator)
-    # update_learning_rate(net_d_scheduler, optim_discriminator)
+    # update_learning_rate(net_g_scheduler, optim_generator)
+    update_learning_rate(net_d_scheduler, optim_discriminator)
 
     ##### Logger ######
 
