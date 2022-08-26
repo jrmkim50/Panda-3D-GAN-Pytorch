@@ -21,8 +21,8 @@ class Options():
         parser.add_argument('--workers', default=8, type=int, help='number of data loading workers')
         parser.add_argument('--lamb', type=float, default=100, help='weight on L1 term in objective')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
-        parser.add_argument('--generatorWeights', type=str, default='./checkpoints/g.pth', help="path to generator weights (to continue training)")
-        parser.add_argument('--discriminatorWeights', type=str, default='./checkpoints/d.pth', help="path to discriminator weights (to continue training)")
+        parser.add_argument('--generatorWeights', type=str, default='./checkpoints/g_unet_only_f18_only.pth', help="path to generator weights (to continue training)")
+        parser.add_argument('--discriminatorWeights', type=str, default='./checkpoints/d_discrim_only_f18_only.pth', help="path to discriminator weights (to continue training)")
 
         # basic parameters
         parser.add_argument('--direction', type=str, default='image_to_label', help='image_to_label or label_to_image')
@@ -50,7 +50,7 @@ class Options():
         parser.add_argument('--niter_decay', type=int, default=100, help='# of iter to linearly decay learning rate to zero')
         parser.add_argument('--lr_policy', type=str, default='lambda', help='learning rate policy: lambda|step|plateau|cosine')
         parser.add_argument('--lr_decay_iters', type=int, default=50, help='multiply by a gamma every lr_decay_iters iterations')
-        parser.add_argument('--resume', default=0, type=int, help='resume training or not default:0/not')
+        parser.add_argument('--resume', default=1, type=int, help='resume training or not default:0/not')
 
         # Inference
         # This is just a trick to make the predict script working
