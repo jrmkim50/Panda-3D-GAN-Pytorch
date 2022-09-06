@@ -456,6 +456,8 @@ class NifitDataSet(torch.utils.data.Dataset):
             label.SetOrigin(image.GetOrigin())
             label.SetSpacing(image.GetSpacing())
 
+        label = Normalization(label)  # set intensity 0-1
+
         sample = {'image': image, 'label': label}
 
         if self.transforms:  # apply the transforms to image and label (normalization, resampling, patches)
@@ -472,8 +474,6 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         image_np = image_np[np.newaxis, :, :, :]
         label_np = label_np[np.newaxis, :, :, :]
-        
-        label_np[label_np > 2] = 2
 
         return torch.from_numpy(image_np), torch.from_numpy(label_np)  # this is the final output to feed the network
 
@@ -485,12 +485,9 @@ def Normalization(image):
     """
     Normalize an image to 0 - 1
     """
-    normalizeFilter = sitk.NormalizeImageFilter()
     resacleFilter = sitk.RescaleIntensityImageFilter()
     resacleFilter.SetOutputMaximum(1)
     resacleFilter.SetOutputMinimum(0)
-
-    image = normalizeFilter.Execute(image)  # set mean and std deviation
     image = resacleFilter.Execute(image)  # set intensity 0-1
 
     return image
