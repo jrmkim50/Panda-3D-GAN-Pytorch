@@ -291,7 +291,7 @@ def brightness(image):
     max = 1
     min = 0
 
-    c = np.random.randint(-0.07, 0.07)
+    c = np.random.uniform(-0.07, 0.07)
 
     array = array + c
 
@@ -317,7 +317,7 @@ def contrast(image):
     IOD = np.sum(array)
     luminanza = int(IOD / ntotpixel)
 
-    c = np.random.randint(-0.07, 0.07)
+    c = np.random.uniform(-0.07, 0.07)
 
     d = array - luminanza
     dc = d * abs(c) / 100
@@ -969,7 +969,7 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 1, 4, 5, 6, 7, 10, 11])
+        choice = np.random.choice([0, 1, 4, 5, 6, 7, 11])
 
         # no augmentation
         if choice == 0:  # no augmentation
@@ -980,10 +980,10 @@ class Augmentation(object):
         # Additive Gaussian noise
         if choice == 1:  # Additive Gaussian noise according to a selected SNR
 
-            SNR = np.random.uniform(80, 200)
+            SNR = np.random.randint(80, 200)
             self.noiseFilter = sitk.AdditiveGaussianNoiseImageFilter()
             self.noiseFilter.SetMean(0)
-            self.noiseFilter.SetStandardDeviation(sample['image'].mean()/SNR)
+            self.noiseFilter.SetStandardDeviation(0.07/SNR)
 
             image, label = sample['image'], sample['label']
             image = self.noiseFilter.Execute(image)
