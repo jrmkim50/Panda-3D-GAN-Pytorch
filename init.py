@@ -28,7 +28,7 @@ class Options():
         parser.add_argument('--direction', type=str, default='image_to_label', help='image_to_label or label_to_image')
         parser.add_argument('--data_path', type=str, default='./Data_folder/train')
         parser.add_argument('--val_path', type=str, default='./Data_folder/test/')
-        parser.add_argument('--increase_factor_data',  default=10, type=int, help='Increase the data number passed each epoch')
+        parser.add_argument('--increase_factor_data',  default=5, type=int, help='Increase the data number passed each epoch')
         parser.add_argument('--output', type=str, default='./checkpoints/')
         parser.add_argument('--gpu_ids', type=str, default='6,7', help='gpu ids: e.g. 0  0,1,2, 0,2. use -1 for CPU')
         parser.add_argument('--save_fre', type=int, default=25, help='checkpoint save frequency')
