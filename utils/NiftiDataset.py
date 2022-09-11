@@ -288,10 +288,10 @@ def brightness(image):
     direction = image.GetDirection()
     origin = image.GetOrigin()
 
-    max = 255
+    max = 1
     min = 0
 
-    c = np.random.randint(-20, 20)
+    c = np.random.randint(-0.07, 0.07)
 
     array = array + c
 
@@ -317,18 +317,18 @@ def contrast(image):
     IOD = np.sum(array)
     luminanza = int(IOD / ntotpixel)
 
-    c = np.random.randint(-20, 20)
+    c = np.random.randint(-0.07, 0.07)
 
     d = array - luminanza
     dc = d * abs(c) / 100
 
     if c >= 0:
         J = array + dc
-        J[J >= 255] = 255
+        J[J >= 1] = 1
         J[J <= 0] = 0
     else:
         J = array - dc
-        J[J >= 255] = 255
+        J[J >= 1] = 1
         J[J <= 0] = 0
 
     img = sitk.GetImageFromArray(np.transpose(J, axes=(2, 1, 0)))
@@ -969,12 +969,58 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 5, 10, 11])
+        choice = np.random.choice([0, 1, 4, 5, 6, 7, 10, 11])
 
         # no augmentation
         if choice == 0:  # no augmentation
 
             image, label = sample['image'], sample['label']
+            return {'image': image, 'label': label}
+
+        # Additive Gaussian noise
+        if choice == 1:  # Additive Gaussian noise according to a selected SNR
+
+            SNR = np.random.uniform(80, 200)
+            self.noiseFilter = sitk.AdditiveGaussianNoiseImageFilter()
+            self.noiseFilter.SetMean(0)
+            self.noiseFilter.SetStandardDeviation(sample['image'].mean()/SNR)
+
+            image, label = sample['image'], sample['label']
+            image = self.noiseFilter.Execute(image)
+            if Segmentation is False:
+                label = self.noiseFilter.Execute(label)
+
+            return {'image': image, 'label': label}
+
+        # BSpline Deformation
+        if choice == 4:  # BSpline Deformation
+
+            randomness = 10
+
+            assert isinstance(randomness, (int, float))
+            if randomness > 0:
+                self.randomness = randomness
+            else:
+                raise RuntimeError('Randomness should be non zero values')
+
+            image, label = sample['image'], sample['label']
+            spline_order = 3
+            domain_physical_dimensions = [image.GetSize()[0] * image.GetSpacing()[0],
+                                          image.GetSize()[1] * image.GetSpacing()[1],
+                                          image.GetSize()[2] * image.GetSpacing()[2]]
+
+            bspline = sitk.BSplineTransform(3, spline_order)
+            bspline.SetTransformDomainOrigin(image.GetOrigin())
+            bspline.SetTransformDomainDirection(image.GetDirection())
+            bspline.SetTransformDomainPhysicalDimensions(domain_physical_dimensions)
+            bspline.SetTransformDomainMeshSize((10, 10, 10))
+
+            # Random displacement of the control points.
+            originalControlPointDisplacements = np.random.random(len(bspline.GetParameters())) * self.randomness
+            bspline.SetParameters(originalControlPointDisplacements)
+
+            image = sitk.Resample(image, bspline)
+            label = sitk.Resample(label, bspline)
             return {'image': image, 'label': label}
 
         # Random flip
@@ -985,6 +1031,28 @@ class Augmentation(object):
 
             image = flipit(image, axes)
             label = flipit(label, axes)
+
+            return {'image': image, 'label': label}
+
+        # Brightness
+        if choice == 6:  # Brightness
+
+            image, label = sample['image'], sample['label']
+
+            image = brightness(image)
+            if Segmentation is False:
+                label = brightness(label)
+
+            return {'image': image, 'label': label}
+
+        # Contrast
+        if choice == 7:  # Contrast
+
+            image, label = sample['image'], sample['label']
+
+            image = contrast(image)
+            if Segmentation is False:
+                label = contrast(label)             # comment for segmentation
 
             return {'image': image, 'label': label}
 
