@@ -30,7 +30,7 @@ parser.add_argument("--result", type=str, default='./Data_folder/test/patient_5/
 parser.add_argument("--weights", type=str, default='./checkpoints/g_epoch_200.pth', help='generator weights to load')
 parser.add_argument("--resample", default=False, help='Decide or not to resample the images to a new resolution')
 parser.add_argument("--new_resolution", type=float, default=(0.625, 0.625, 1), help='New resolution')
-parser.add_argument("--patch_size", type=int, nargs=3, default=[64, 64, 128], help="Input dimension for the generator")
+parser.add_argument("--patch_size", type=int, nargs=3, default=[64, 64, 64], help="Input dimension for the generator")
 parser.add_argument("--batch_size", type=int, nargs=1, default=1, help="Batch size to feed the network (currently supports 1)")
 parser.add_argument("--stride_inplane", type=int, nargs=1, default=16, help="Stride size in 2D plane")
 parser.add_argument("--stride_layer", type=int, nargs=1, default=16, help="Stride size in z direction")
@@ -67,7 +67,9 @@ def inference(write_image, model, image_path, label_path, result_path, resample,
     # create transformations to image and labels
     transforms1 = []
 
-    transforms2 = []
+    transforms2 = [
+        NiftiDataset.Padding((patch_size_x, patch_size_y, patch_size_z))
+    ]
 
     # read image file
     reader = sitk.ImageFileReader()
