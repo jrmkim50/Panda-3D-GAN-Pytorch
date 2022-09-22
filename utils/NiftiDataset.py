@@ -428,8 +428,9 @@ class NifitDataSet(torch.utils.data.Dataset):
 
         else:
 
+            temp = label_path
             label_path = data_path
-            data_path = label_path
+            data_path = temp
 
         # read image and label
         image = self.read_image(data_path)
