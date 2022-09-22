@@ -25,7 +25,7 @@ class Options():
         parser.add_argument('--discriminatorWeights', type=str, default='./checkpoints/d_discrim_only_f18_only.pth', help="path to discriminator weights (to continue training)")
 
         # basic parameters
-        parser.add_argument('--direction', type=str, default='image_to_label', help='image_to_label or label_to_image')
+        parser.add_argument('--direction', type=str, default='label_to_image', help='image_to_label or label_to_image')
         parser.add_argument('--data_path', type=str, default='./Data_folder/train')
         parser.add_argument('--val_path', type=str, default='./Data_folder/test/')
         parser.add_argument('--increase_factor_data',  default=5, type=int, help='Increase the data number passed each epoch')
