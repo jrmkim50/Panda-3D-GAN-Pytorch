@@ -296,6 +296,8 @@ if __name__ == "__main__":
         net = build_netG(opt).cuda()
 
     net.load_state_dict(new_state_dict(args.weights))
+    
+    net.eval()
 
     result, dice = inference(True, net, args.image, None, args.result, args.resample, args.new_resolution,
                        args.patch_size[0],args.patch_size[1],args.patch_size[2], args.stride_inplane, args.stride_layer, segmentation=False, Logger=False)

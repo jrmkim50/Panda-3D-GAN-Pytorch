@@ -108,6 +108,9 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
     mean_generator_total_loss = 0.0
     mean_discriminator_loss = 0.0
 
+    generator.train()
+    discriminator.train()
+
     for batch_idx, (data, label) in enumerate(train_loader):
 
         real_a = data
@@ -180,6 +183,9 @@ for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
     ]
     val_set = NifitDataSet(val_list, direction=opt.direction, transforms=val_transforms, test=True)
     val_loader = DataLoader(val_set, batch_size=opt.batch_size, shuffle=False, num_workers=opt.workers)
+
+    generator.eval()
+    discriminator.eval()
 
     plot_generated_batch(val_list=val_list, model=generator, resample=opt.resample, resolution=opt.new_resolution,
                          patch_size_x=opt.patch_size[0], patch_size_y=opt.patch_size[1],
