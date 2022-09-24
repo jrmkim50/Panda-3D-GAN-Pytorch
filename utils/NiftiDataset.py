@@ -970,7 +970,7 @@ class Augmentation(object):
 
     def __call__(self, sample):
 
-        choice = np.random.choice([0, 1, 4, 5, 6, 7, 11])
+        choice = np.random.choice([0, 1, 4, 5])
 
         # no augmentation
         if choice == 0:  # no augmentation
@@ -1027,11 +1027,11 @@ class Augmentation(object):
         # Random flip
         if choice == 5:  # Random flip
 
-            axes = np.random.choice([0, 1])
             image, label = sample['image'], sample['label']
 
-            image = flipit(image, axes)
-            label = flipit(label, axes)
+            flipaxes = [True, False, False]
+            image = sitk.Flip(image, flipaxes)
+            label = sitk.Flip(label, flipaxes)
 
             return {'image': image, 'label': label}
 
