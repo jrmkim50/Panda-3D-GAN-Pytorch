@@ -19,7 +19,7 @@ class Options():
         parser.add_argument('--generatorLR', type=float, default=0.0002, help='learning rate for generator')
         parser.add_argument('--discriminatorLR', type=float, default=0.0002, help='learning rate for discriminator')
         parser.add_argument('--workers', default=8, type=int, help='number of data loading workers')
-        parser.add_argument('--lamb', type=float, default=100, help='weight on L1 term in objective')
+        parser.add_argument('--lamb', type=float, default=50, help='weight on L1 term in objective')
         parser.add_argument('--checkpoints_dir', type=str, default='./checkpoints', help='models are saved here')
         parser.add_argument('--generatorWeights', type=str, default='./checkpoints/g_unet_only_f18_only.pth', help="path to generator weights (to continue training)")
         parser.add_argument('--discriminatorWeights', type=str, default='./checkpoints/d_discrim_only_f18_only.pth', help="path to discriminator weights (to continue training)")
