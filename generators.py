@@ -281,7 +281,7 @@ def build_netG(opt):
     if opt.netG == 'resnet':
         generator = ResnetGenerator(opt.img_channel, opt.img_channel, opt.ngf, use_dropout=False, n_blocks=9)
     elif opt.netG == 'Unet':
-        generator = UnetGenerator(ngf=opt.ngf, use_dropout=False, norm_layer=nn.BatchNorm3d)
+        generator = UnetGenerator(ngf=opt.ngf, use_dropout=True, norm_layer=nn.BatchNorm3d)
     else:
         raise NotImplementedError
 
