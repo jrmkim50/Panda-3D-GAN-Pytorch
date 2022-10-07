@@ -39,7 +39,7 @@ class Options():
         parser.add_argument('--min_pixel', default=1, help='Percentage of minimum non-zero pixels in the cropped label')
         parser.add_argument('--drop_ratio', default=0, help='Probability to drop a cropped area if the label is empty. All empty patches will be dropped for 0 and accept all cropped patches if set to 1')
         parser.add_argument('--batch_size', type=int, default=4, help='batch size')
-        parser.add_argument('--patch_size', default=[64, 64, 12], help='Size of the patches extracted from the image')
+        parser.add_argument('--patch_size', default=[64, 64, 64], help='Size of the patches extracted from the image')
         parser.add_argument('--img_channel', default=1, type=int, help='Channels of the image')
         parser.add_argument("--stride_inplane", type=int, nargs=1, default=32, help="Stride size in 2D plane")
         parser.add_argument("--stride_layer", type=int, nargs=1, default=16, help="Stride size in z direction")
