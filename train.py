@@ -79,7 +79,7 @@ else:
 
 
 criterionMSE = nn.MSELoss()  # nn.MSELoss()
-criterionGAN = GANLoss(use_lsgan=False) # TODO: Should I use LSGAN loss?
+criterionGAN = GANLoss()
 criterion_pixelwise = nn.L1Loss()
 # -----  Use Single GPU or Multiple GPUs -----
 if (opt.gpu_ids != -1) & torch.cuda.is_available():
